@@ -253,6 +253,9 @@ background-position: 3px -94px;
 	box-shadow: 0 8px 17px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
 }
 /*-- about me --*/
+.u-about-box {
+	padding: 20px 0;
+}
 .u-about-box .u-about-title {
 	text-align: center;
 	padding-bottom: 5px;
@@ -432,7 +435,7 @@ span.border.one:after {
 }
 
 #services {
-    padding: 5em 0;
+    padding: 4em 0;
     background: #fff;
 }
 .service-head.one h3{

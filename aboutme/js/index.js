@@ -1,5 +1,7 @@
 $(document).ready(function ($) {
     indexMgr.intSkillBar();
+    indexMgr.initScroll();
+    indexMgr.initTopHover();
 });
 
 var indexMgr = {
@@ -54,5 +56,16 @@ var indexMgr = {
 
         // 使用刚指定的配置项和数据显示图表。
         myChart.setOption(option);
+    },
+
+    initScroll: function () {
+        $(".scroll").click(function (event) {
+            event.preventDefault();
+            $('html,body').animate({ scrollTop: $(this.hash).offset().top }, 1000);
+        });
+    },
+
+    initTopHover: function () {
+      $().UItoTop({ easingType: 'easeOutQuart' });
     }
 }
