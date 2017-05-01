@@ -2,6 +2,9 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const mime = require('mime');
+
+const chatServer = require('./lib/chat_server');
+
 let cache = {};
 
 // 发送文件数据及错误响应
@@ -53,3 +56,5 @@ const server = http.createServer(function (request, response) {
 server.listen(3000, function () {
     console.log('Server listening on port 3000.');
 });
+
+chatServer.listen(server);
