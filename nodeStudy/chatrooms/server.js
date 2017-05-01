@@ -25,18 +25,12 @@ function serveStatic(response, cache, absPath) {
     if (cache[absPath]) {
         sendFile(response, absPath, cache[absPath]);
     } else {
-        fs.exists(absPath, function (exists) {
-            if (exists) {
-                fs.readFile(absPath, function (err, data) {
-                    if (err) {
-                        send404(response);
-                    } else {
-                        cache[absPath] = data;
-                        sendFile(response, absPath, data);
-                    }
-                });
-            } else {
+        fs.readFile(absPath, function (err, data) {
+            if (err) {
                 send404(response);
+            } else {
+                cache[absPath] = data;
+                sendFile(response, absPath, data);
             }
         });
     }
@@ -52,7 +46,7 @@ const server = http.createServer(function (request, response) {
         filePath = 'public' + request.url;
     }
 
-    const absPath = './' + filePath;
+    const absPath = '/nodestudy/vscode/nodeStudy/chatrooms/' + filePath;
     serveStatic(response, cache, absPath);
 });
 
