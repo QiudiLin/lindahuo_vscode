@@ -38,6 +38,7 @@ function assignGuestName(socket, guestNumber, nickNames, namesUsed) {
         name: name
     });
     nameUsed.push(name);
+
     return guestNumber + 1;
 };
 
@@ -51,6 +52,7 @@ function joinRoom(socket, room) {
     });
 
     const usersInRoom = io.sockets.clients(room);
+    // 如果房间用户人数大于 1，汇总人数
     if (usersInRoom.length > 1) {
         const usersInRoomSummary = 'Users currently in ' + room + ': ';
         for (let index in usersInRoom) {
@@ -65,4 +67,62 @@ function joinRoom(socket, room) {
             socket.emit('message', { text: usersInRoomSummary });
         }
     }
+};
+
+// 更改请求的处理逻辑
+function handleNameChangeAttempts(socket, nickNames, namesUsed) {
+    socket.on('nameAttempt', (name) => {
+        if (name.indexOf('Guest') == 0) {
+            socket.emit('nameResult', {
+                success: false,
+                message: 'Names cannot begin with "Guest"'
+            });
+        } else {
+            if (namesUsed.indexOf(name) == -1) {
+                const previousName = nickNames[socket.id];
+                const previousNameIndex = namesUsed.indexOf(previousName);
+                namesUsed.push(name);
+                nickNames[socket.id] = name;
+                delete namesUsed[previousNameIndex];
+                socket.emit('nameResult', {
+                    success: true,
+                    name: name
+                });
+                socket.broadcase.to(currentRoom[socket.id]).emit('message', {
+                    text: previousName + ' is now know as ' + name + '.'
+                });
+            } else {
+                socket.emi('nameResult', {
+                    success: false,
+                    message: 'That name is already in use.'
+                });
+            }
+        }
+    });
+};
+
+// 发起聊天信息
+function handleMessageBroadcasting(socket) {
+    socket.on('message', (message) => {
+        socket.broadcast.to(messsage.room).emit('message', {
+            text: nickNames[socket.id] + ': ' + message.text
+        });
+    });
+};
+
+// 创建房间
+function handleRoomJoining(socket) {
+    socket.on('join', (room) => {
+        socket.leave(currentRoom[socket.id]);
+        joinRoom(socket, room.newRoom);
+    });
+};
+
+// 用户断开连接
+function handleClientDisconnection(socket) {
+    socket.on('disconnect', () => {
+        const nameIndex = namesUsed.indexOf(nickNames[socket.id]);
+        delete namesUsed[nameIndex];
+        delete nickNames[socket.id];
+    });
 };
