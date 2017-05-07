@@ -6,27 +6,26 @@ let nickNames = {};
 let namesUsed = [];
 let currentRoom = {};
 
-exports.listen = function () {
+exports.listen = function (server) {
     // 启动 socket io 服务器，允许它搭载在已有的 HTTP 服务器上
     io = socketio.listen(server);
     io.set('log leve', 1);
 
     io.sockets.on('connection', (socket) => {
-        guestNumber = assignGuestName(socket, guestNumber, nickNames, namesUsed)
+        guestNumber = assignGuestName(socket, guestNumber, nickNames, namesUsed);
+        // 在用户连接上来时把他放入聊天室 Lobby 里
+        joinRoom(socket, 'Lobby');
+        // 处理用户的消息，更名，以及聊天室的创建和变更
+        handleMessageBroadcasting(socket, nickNames);
+        handleNameChangeAttempts(socket, nickNames, nameUsed);
+        handleRoomJoining(socket);
+        // 用户发出请求时，向其提供已经被占用的聊天室的列表
+        socket.on('rooms', function () {
+            socket.emit('rooms', io.sockets.manager.rooms);
+        });
+        // 定义用户断开连接后的清除逻辑
+        handleClientDisconnection(socket, nickNames, namesUsed);
     });
-
-    // 在用户连接上来时把他放入聊天室 Lobby 里
-    joinRoom(socket, 'Lobby');
-    // 处理用户的消息，更名，以及聊天室的创建和变更
-    handleMessageBroadcasting(socket, nickNames);
-    handleNameChangeAttempts(socket, nickNames, nameUsed);
-    handleRoomJoining(socket);
-    // 用户发出请求时，向其提供已经被占用的聊天室的列表
-    socket.on('rooms', function () {
-        socket.emit('rooms', io.sockets.manager.rooms);
-    });
-    // 定义用户断开连接后的清除逻辑
-    handleClientDisconnection(socket, nickNames, namesUsed);
 };
 
 // 分配用户昵称
