@@ -17,7 +17,7 @@ exports.listen = function (server) {
         joinRoom(socket, 'Lobby');
         // 处理用户的消息，更名，以及聊天室的创建和变更
         handleMessageBroadcasting(socket, nickNames);
-        handleNameChangeAttempts(socket, nickNames, nameUsed);
+        handleNameChangeAttempts(socket, nickNames, namesUsed);
         handleRoomJoining(socket);
         // 用户发出请求时，向其提供已经被占用的聊天室的列表
         socket.on('rooms', function () {
@@ -36,7 +36,7 @@ function assignGuestName(socket, guestNumber, nickNames, namesUsed) {
         success: true,
         name: name
     });
-    nameUsed.push(name);
+    namesUsed.push(name);
 
     return guestNumber + 1;
 };
@@ -46,7 +46,7 @@ function joinRoom(socket, room) {
     socket.join(room);
     currentRoom[socket.io] = room;
     socket.emit('joinResult', { room: room });
-    socket.broadcase.to(room).emit('message', {
+    socket.broadcast.to(room).emit('message', {
         text: nickNames[socket.id] + ' has joined ' + room + '.'
     });
 
@@ -87,7 +87,7 @@ function handleNameChangeAttempts(socket, nickNames, namesUsed) {
                     success: true,
                     name: name
                 });
-                socket.broadcase.to(currentRoom[socket.id]).emit('message', {
+                socket.broadcast.to(currentRoom[socket.id]).emit('message', {
                     text: previousName + ' is now know as ' + name + '.'
                 });
             } else {

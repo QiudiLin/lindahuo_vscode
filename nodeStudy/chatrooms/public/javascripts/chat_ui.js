@@ -28,7 +28,7 @@ function processUserInput(chatApp, socket) {
 
 // 客户单程序初始化逻辑
 
-const socket = io.connect;
+const socket = io.connect();
 
 $(document).ready(() => {
     let chatApp = new Chat(socket);
